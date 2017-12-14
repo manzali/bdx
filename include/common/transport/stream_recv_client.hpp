@@ -4,45 +4,42 @@
 #include <functional>
 
 #include "common/engine.hpp"
-#include "common/transport/endpoint.hpp"
 #include "common/transport/buffer.hpp"
+#include "common/transport/endpoint.hpp"
 
 namespace common {
 
 namespace transport {
 
-class stream_recv_client {
+typedef std::function<size_t(buffer::const_iterator, buffer::const_iterator)>
+    parser_t;
 
+class stream_recv_client {
   endpoint m_ep;
   boost::asio::ip::tcp::socket m_socket;
-  boost::asio::deadline_timer m_retry_timer;
-  std::unique_ptr<buffer> m_buffer;
-  std::function<std::vector<size_t>(buffer const&, size_t)> m_parser;
+  common::engine::timer_t m_retry_timer;
+  buffer m_buffer;
+  parser_t m_parser;
 
  public:
-
-  stream_recv_client(
-      common::engine::engine& engine,
-      endpoint const& ep,
-      size_t max_buffer_size,
-      std::function<std::vector<size_t>(buffer const&, size_t)> const& parser);
+  stream_recv_client(common::engine::engine& engine,
+                     endpoint const& ep,
+                     parser_t const& parser);
   ~stream_recv_client();
   stream_recv_client(stream_recv_client const&) = delete;
   void operator=(stream_recv_client const&) = delete;
 
  private:
-
   void connection_handler(boost::system::error_code const& ec);
-  void recv_handler(
-      boost::system::error_code const& ec,
-      std::size_t bytes_transferred,
-      size_t bytes_offset);
-  void start_retry_timer(long seconds);
+  void recv_handler(boost::system::error_code const& ec,
+                    size_t bytes_transferred,
+                    size_t bytes_offset);
+  void start_retry_timer(std::chrono::seconds const& s);
   void retry_timer_handler(boost::system::error_code const& ec);
 };
 
-}
+}  // namespace transport
 
-}
+}  // namespace common
 
 #endif

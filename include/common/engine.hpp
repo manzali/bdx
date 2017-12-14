@@ -2,6 +2,7 @@
 #define COMMON_ENGINE_HPP
 
 #include <thread>
+#include <chrono>
 #include <stdexcept>
 
 #include <boost/asio.hpp>
@@ -9,6 +10,8 @@
 namespace common {
 
 namespace engine {
+
+typedef boost::asio::basic_waitable_timer<std::chrono::high_resolution_clock> timer_t;
 
 class engine {
 
@@ -28,7 +31,7 @@ class engine {
 
   template<typename HandlerType>
   void post(HandlerType handler) {
-    m_io_service.post(handler); // thread safe
+    m_io_service.post(handler);  // thread safe
   }
 
   ~engine() {

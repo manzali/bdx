@@ -5,6 +5,7 @@ include_directories(
 
 add_executable(
   ru
+  dataframes_manager.cpp
   main.cpp
 )
 
