@@ -13,7 +13,7 @@ namespace ru {
 class dataframes_manager {
   common::engine::engine& m_engine;
   std::mutex m_mutex;
-  std::vector<common::transport::buffer> m_dataframes;
+  std::map<uint64_t, std::vector<common::transport::buffer>> m_dataframes;
 
  public:
   dataframes_manager(common::engine::engine& engine);
